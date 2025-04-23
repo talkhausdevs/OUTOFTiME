@@ -3,197 +3,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OUT OF TiME: The Escape</title>
+  <title>The Mirror Club</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
       height: 100%;
+      background: url('out_of_time_bg.png') no-repeat center center fixed;
+      background-size: cover;
       font-family: 'Courier New', Courier, monospace;
+      color: white;
+      overflow: hidden;
     }
-    #splash {
+    #overlay {
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.85);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
+      background: rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+    #dialogue {
+      position: absolute;
+      bottom: 20px;
+      width: 90%;
+      left: 5%;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 10px;
       z-index: 2;
-    }
-    #splash h1 {
-      font-size: 3em;
-      text-shadow: 0 0 10px #fff;
-    }
-    #splash p {
-      margin-top: 20px;
+      backdrop-filter: blur(10px);
       font-size: 1.2em;
-      color: #ccc;
     }
-    canvas {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
+    .choice {
+      margin-top: 15px;
+      display: block;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    #timer {
+    .choice:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    #character {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      right: 20px;
+      bottom: 140px;
+      z-index: 2;
       font-size: 1.5em;
-      color: white;
-      z-index: 3;
-      text-shadow: 0 0 5px #000;
-    }
-    #message {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      color: white;
-      text-shadow: 0 0 10px #000;
-      display: none;
-      z-index: 4;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url('out_of_time_bg.png') no-repeat center center / cover;
-      z-index: 0;
-      filter: brightness(0.7);
+      font-style: italic;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
-  <div id="splash" onclick="startGame()">
-    <h1>OUT OF TiME</h1>
-    <p>Find the portal before time runs out. Tap to Start.</p>
-  </div>
-  <div id="timer">Time: 60</div>
-  <div id="message">YOU FOUND THE PORTAL</div>
-  <canvas id="gameCanvas"></canvas>
-  <audio id="bgm" loop>
+  <audio id="bgm" autoplay loop>
     <source src="take_me_home.mp3" type="audio/mpeg">
   </audio>
+  <div id="overlay"></div>
+  <div id="character">Nova</div>
+  <div id="dialogue">
+    <p>You open your eyes. The lights buzz. The room smells like nostalgia and something fake sweet. You don’t remember walking in.</p>
+    <p><strong>VOICEMAIL:</strong> "You’re almost out of time."</p>
+    <p>A phone you don’t own glows in your hand. The music in the club wraps around you like fog.</p>
+    <p><em>Nova’s voice cuts through the noise...</em></p>
+    <p>"You're late. But at least you're dressed for the fall."</p>
+    <div class="choice" onclick="nextScene('where')">🌀 "Where am I?"</div>
+    <div class="choice" onclick="nextScene('track')">💿 "What track is this?"</div>
+  </div>
+
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const timerDisplay = document.getElementById('timer');
-    const message = document.getElementById('message');
-    let car = { x: window.innerWidth / 2 - 25, y: window.innerHeight - 150, width: 50, height: 100 };
-    let fakePortals = [];
-    let realPortal = null;
-    let keys = {};
-    let timeLeft = 60;
-    let gameLoop, countdown;
-    let gameEnded = false;
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      car.y = canvas.height - 150;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    function drawCar() {
-      ctx.fillStyle = "#000";
-      ctx.fillRect(car.x, car.y, car.width, car.height);
-    }
-
-    function drawPortals() {
-      ctx.fillStyle = "#abfffa";
-      fakePortals.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 10, 0, 2 * Math.PI);
-        ctx.fill();
-      });
-
-      if (realPortal) {
-        ctx.fillStyle = "#00ffcc";
-        ctx.beginPath();
-        ctx.arc(realPortal.x, realPortal.y, 15, 0, 2 * Math.PI);
-        ctx.fill();
+    function nextScene(choice) {
+      const dialogue = document.getElementById('dialogue');
+      const character = document.getElementById('character');
+      if (choice === 'where') {
+        character.innerText = 'Nova';
+        dialogue.innerHTML = '<p>"You’re in The Mirror Club," Nova says, adjusting a glowing dial. "We don’t open often. Only when time bends."</p><p>The bass shifts. The walls shimmer.</p><div class="choice" onclick="nextScene('echo')">🫧 "What does that mean?"</div>';
+      } else if (choice === 'track') {
+        character.innerText = 'Nova';
+        dialogue.innerHTML = '<p>"Track Three. Unreleased. Your heartbeat used to match the BPM," Nova says without looking up.</p><p>The floor glitches under your feet. You steady yourself.</p><div class="choice" onclick="nextScene('vel')">🫣 "Why do I know this song?"</div>';
+      } else if (choice === 'echo') {
+        character.innerText = 'Echo';
+        dialogue.innerHTML = '<p>Before Nova can answer, a notification flickers across the glowing phone. A text: "Don’t listen to her."</p><p>You look up. Someone in a hoodie is watching you from across the club. Their screen lights their face.</p><div class="choice">🔮 [TO BE CONTINUED]</div>';
+      } else if (choice === 'vel') {
+        character.innerText = 'Vel';
+        dialogue.innerHTML = '<p>"Because it was written for you," says a voice behind you.</p><p>You turn — and see someone in a red coat, eyes full of heartbreak and knowing.</p><div class="choice">🔮 [TO BE CONTINUED]</div>';
       }
     }
-
-    function updatePortals() {
-      fakePortals.forEach(p => p.y += 2);
-      fakePortals = fakePortals.filter(p => p.y < canvas.height);
-      if (realPortal) realPortal.y += 2;
-    }
-
-    function checkPortalCollision() {
-      if (realPortal) {
-        const dx = car.x + car.width / 2 - realPortal.x;
-        const dy = car.y + car.height / 2 - realPortal.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < 40) {
-          winGame();
-        }
-      }
-    }
-
-    function update() {
-      if (keys['ArrowLeft'] && car.x > 0) car.x -= 5;
-      if (keys['ArrowRight'] && car.x < canvas.width - car.width) car.x += 5;
-
-      if (Math.random() < 0.03) {
-        fakePortals.push({ x: Math.random() * canvas.width, y: -10 });
-      }
-
-      updatePortals();
-      checkPortalCollision();
-    }
-
-    function game() {
-      if (gameEnded) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      update();
-      drawCar();
-      drawPortals();
-    }
-
-    function countdownTimer() {
-      if (gameEnded) return;
-      timeLeft--;
-      timerDisplay.innerText = "Time: " + timeLeft;
-      if (timeLeft <= 0) {
-        clearInterval(gameLoop);
-        clearInterval(countdown);
-        alert("YOU'RE OUT OF TiME");
-        gameEnded = true;
-      }
-    }
-
-    function winGame() {
-      clearInterval(gameLoop);
-      clearInterval(countdown);
-      message.style.display = "block";
-      gameEnded = true;
-    }
-
-    function startGame() {
-      document.getElementById('splash').style.display = 'none';
-      canvas.style.display = 'block';
-      document.getElementById('bgm').play();
-      realPortal = { x: Math.random() * (window.innerWidth - 30) + 15, y: -100 };
-      gameLoop = setInterval(game, 1000 / 60);
-      countdown = setInterval(countdownTimer, 1000);
-    }
-
-    document.addEventListener('keydown', e => keys[e.key] = true);
-    document.addEventListener('keyup', e => keys[e.key] = false);
   </script>
 </body>
 </html>
