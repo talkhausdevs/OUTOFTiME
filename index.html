@@ -50,6 +50,17 @@
       z-index: 3;
       text-shadow: 0 0 5px #000;
     }
+    #message {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
+      color: white;
+      text-shadow: 0 0 10px #000;
+      display: none;
+      z-index: 4;
+    }
     body::before {
       content: "";
       position: fixed;
@@ -66,9 +77,10 @@
 <body>
   <div id="splash" onclick="startGame()">
     <h1>OUT OF TiME</h1>
-    <p>Tap to Start</p>
+    <p>Find the portal before time runs out. Tap to Start.</p>
   </div>
   <div id="timer">Time: 60</div>
+  <div id="message">YOU FOUND THE PORTAL</div>
   <canvas id="gameCanvas"></canvas>
   <audio id="bgm" loop>
     <source src="take_me_home.mp3" type="audio/mpeg">
@@ -77,11 +89,14 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const timerDisplay = document.getElementById('timer');
+    const message = document.getElementById('message');
     let car = { x: window.innerWidth / 2 - 25, y: window.innerHeight - 150, width: 50, height: 100 };
-    let clocks = [];
+    let fakePortals = [];
+    let realPortal = null;
     let keys = {};
     let timeLeft = 60;
     let gameLoop, countdown;
+    let gameEnded = false;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -96,64 +111,83 @@
       ctx.fillRect(car.x, car.y, car.width, car.height);
     }
 
-    function drawClocks() {
-      ctx.fillStyle = "#fff700";
-      clocks.forEach(clock => {
+    function drawPortals() {
+      ctx.fillStyle = "#abfffa";
+      fakePortals.forEach(p => {
         ctx.beginPath();
-        ctx.arc(clock.x, clock.y, 10, 0, 2 * Math.PI);
+        ctx.arc(p.x, p.y, 10, 0, 2 * Math.PI);
         ctx.fill();
       });
+
+      if (realPortal) {
+        ctx.fillStyle = "#00ffcc";
+        ctx.beginPath();
+        ctx.arc(realPortal.x, realPortal.y, 15, 0, 2 * Math.PI);
+        ctx.fill();
+      }
     }
 
-    function updateClocks() {
-      clocks.forEach(clock => clock.y += 2);
-      clocks = clocks.filter(clock => clock.y < canvas.height);
+    function updatePortals() {
+      fakePortals.forEach(p => p.y += 2);
+      fakePortals = fakePortals.filter(p => p.y < canvas.height);
+      if (realPortal) realPortal.y += 2;
     }
 
-    function checkCollision() {
-      clocks = clocks.filter(clock => {
-        const dx = car.x + car.width / 2 - clock.x;
-        const dy = car.y + car.height / 2 - clock.y;
+    function checkPortalCollision() {
+      if (realPortal) {
+        const dx = car.x + car.width / 2 - realPortal.x;
+        const dy = car.y + car.height / 2 - realPortal.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < 30) {
-          timeLeft += 5;
-          return false;
+        if (distance < 40) {
+          winGame();
         }
-        return true;
-      });
+      }
     }
 
     function update() {
       if (keys['ArrowLeft'] && car.x > 0) car.x -= 5;
       if (keys['ArrowRight'] && car.x < canvas.width - car.width) car.x += 5;
-      if (Math.random() < 0.02) {
-        clocks.push({ x: Math.random() * canvas.width, y: -10 });
+
+      if (Math.random() < 0.03) {
+        fakePortals.push({ x: Math.random() * canvas.width, y: -10 });
       }
-      updateClocks();
-      checkCollision();
+
+      updatePortals();
+      checkPortalCollision();
     }
 
     function game() {
+      if (gameEnded) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       update();
       drawCar();
-      drawClocks();
+      drawPortals();
     }
 
     function countdownTimer() {
+      if (gameEnded) return;
       timeLeft--;
       timerDisplay.innerText = "Time: " + timeLeft;
       if (timeLeft <= 0) {
         clearInterval(gameLoop);
         clearInterval(countdown);
         alert("YOU'RE OUT OF TiME");
+        gameEnded = true;
       }
+    }
+
+    function winGame() {
+      clearInterval(gameLoop);
+      clearInterval(countdown);
+      message.style.display = "block";
+      gameEnded = true;
     }
 
     function startGame() {
       document.getElementById('splash').style.display = 'none';
       canvas.style.display = 'block';
       document.getElementById('bgm').play();
+      realPortal = { x: Math.random() * (window.innerWidth - 30) + 15, y: -100 };
       gameLoop = setInterval(game, 1000 / 60);
       countdown = setInterval(countdownTimer, 1000);
     }
