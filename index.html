@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>The Mirror Club</title>
+  <title>The Mirror Club – Scene 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
@@ -63,33 +63,27 @@
     <source src="take_me_home.mp3" type="audio/mpeg">
   </audio>
   <div id="overlay"></div>
-  <div id="character">Nova</div>
+  <div id="character">Echo</div>
   <div id="dialogue">
-    <p>You open your eyes. The lights buzz. The room smells like nostalgia and something fake sweet. You don’t remember walking in.</p>
-    <p><strong>VOICEMAIL:</strong> "You’re almost out of time."</p>
-    <p>A phone you don’t own glows in your hand. The music in the club wraps around you like fog.</p>
-    <p><em>Nova’s voice cuts through the noise...</em></p>
-    <p>"You're late. But at least you're dressed for the fall."</p>
-    <div class="choice" onclick="nextScene('where')">🌀 "Where am I?"</div>
-    <div class="choice" onclick="nextScene('track')">💿 "What track is this?"</div>
+    <p>A notification flickers again.</p>
+    <p><strong>TEXT FROM UNKNOWN:</strong> "Don’t listen to her."</p>
+    <p>You scan the room — and lock eyes with someone in a hoodie across the club. They tilt their head. You can’t read their face, just the glow of a cracked phone screen.</p>
+    <p>Echo walks up slowly, their voice low and unreadable.</p>
+    <p>"She only tells half the story. I remember what they wiped."</p>
+    <div class="choice" onclick="nextScene('trust')">📱 "So what do you want from me?"</div>
+    <div class="choice" onclick="nextScene('deny')">🔒 "I don’t know you." </div>
   </div>
 
   <script>
     function nextScene(choice) {
       const dialogue = document.getElementById('dialogue');
       const character = document.getElementById('character');
-      if (choice === 'where') {
-        character.innerText = 'Nova';
-        dialogue.innerHTML = '<p>"You’re in The Mirror Club," Nova says, adjusting a glowing dial. "We don’t open often. Only when time bends."</p><p>The bass shifts. The walls shimmer.</p><div class="choice" onclick="nextScene('echo')">🫧 "What does that mean?"</div>';
-      } else if (choice === 'track') {
-        character.innerText = 'Nova';
-        dialogue.innerHTML = '<p>"Track Three. Unreleased. Your heartbeat used to match the BPM," Nova says without looking up.</p><p>The floor glitches under your feet. You steady yourself.</p><div class="choice" onclick="nextScene('vel')">🫣 "Why do I know this song?"</div>';
-      } else if (choice === 'echo') {
+      if (choice === 'trust') {
         character.innerText = 'Echo';
-        dialogue.innerHTML = '<p>Before Nova can answer, a notification flickers across the glowing phone. A text: "Don’t listen to her."</p><p>You look up. Someone in a hoodie is watching you from across the club. Their screen lights their face.</p><div class="choice">🔮 [TO BE CONTINUED]</div>';
-      } else if (choice === 'vel') {
-        character.innerText = 'Vel';
-        dialogue.innerHTML = '<p>"Because it was written for you," says a voice behind you.</p><p>You turn — and see someone in a red coat, eyes full of heartbreak and knowing.</p><div class="choice">🔮 [TO BE CONTINUED]</div>';
+        dialogue.innerHTML = '<p>"I need you to remember," Echo says. "The glitch started with you. You made the first loop."</p><p>You feel a pulse in your head. A flash of a memory that never happened.</p><div class="choice">🌀 [TO BE CONTINUED in Scene 3]</div>';
+      } else if (choice === 'deny') {
+        character.innerText = 'Echo';
+        dialogue.innerHTML = '<p>"You will," they say, stepping back into the crowd. The lights flash — and they vanish.</p><p>Behind you, Nova’s track skips. The club breathes in glitch.</p><div class="choice">💔 [TO BE CONTINUED in Scene 3]</div>';
       }
     }
   </script>
